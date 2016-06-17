@@ -1,0 +1,57 @@
+<html>
+<head>
+</head>
+<body>
+    <p>Say something to have it read back</p>
+    <button id="start" disabled>Start listening</button>
+
+  <script>
+document.addEventListener("DOMContentLoaded", function() {
+    // TODO: Polyfill?
+    var recognition = new webkitSpeechRecognition();
+
+    speechSynthesis.onvoiceschanged = function() {
+      document.getElementById('start').disabled = false;
+    };
+
+    // Set this to true so that recognition will continue even if the user pauses.
+    recognition.continuous = true;
+
+    recognition.onstart = function() { console.log("Started"); };
+    recognition.onresult = function(event) {
+      var results = event.results;
+
+      var transcript = [];
+
+      for (result of results) {
+        transcript.push(result[0].transcript);
+
+      }
+
+      console.log(transcript);
+
+      transcript.forEach(function(utterance) {
+          // Seems like this list isn't always populated - race conditions.
+        var voices = speechSynthesis.getVoices();
+        var googleVoice = voices.filter((x) => x.name === "Google UK English Female")[0];
+        var toSay = new SpeechSynthesisUtterance(utterance);
+        toSay.voice = googleVoice;
+        window.speechSynthesis.speak(toSay);
+      });
+    };
+    recognition.onerror = function(event) { console.error(event); };
+    recognition.onend = function() { console.log("Ended"); };
+
+    recognition.lang = 'en-US';
+
+    document.getElementById("start").addEventListener("click", function(e) {
+      e.target.disabled = true;
+/// NOTE: Pages hosted on HTTPS do not need to ask repeatedly for permission, whereas
+/// HTTP hosted pages do.
+      recognition.start();
+    });
+});
+
+  </script>
+</body>
+</html>
