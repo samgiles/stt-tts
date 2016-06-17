@@ -38,6 +38,7 @@ document.addEventListener("DOMContentLoaded", function() {
         toSay.voice = googleVoice;
         window.speechSynthesis.speak(toSay);
       });
+      recognition.stop();
     };
     recognition.onerror = function(event) { console.error(event); };
     recognition.onend = function() { console.log("Ended"); };
